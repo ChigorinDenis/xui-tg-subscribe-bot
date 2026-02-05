@@ -12,3 +12,15 @@ export const onlineClientsToStr = (obj) => {
     return acc;
   }, '');
 }
+
+export const makeCopyBtn = (text ,copyText) => {
+  const replyMarkup = {
+      inline_keyboard: [[
+        {
+          text,
+          copy_text: { text: copyText }
+        }
+      ]]
+    }
+  return replyMarkup;
+}

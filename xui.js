@@ -8,8 +8,10 @@ const jar = new CookieJar();
 export const api = wrapper(axios.create({
   baseURL: process.env.XUI_URL,
   jar,
-  withCredentials: true
+  withCredentials: true,
+  timeout: 10_000
 }));
+
 
 export async function login() {
   await api.post("/login", new URLSearchParams({
@@ -17,6 +19,46 @@ export async function login() {
     password: process.env.XUI_PASS
   }));
 }
+
+api.interceptors.response.use(
+  res => res,
+  async (error) => {
+    const status = error.response?.status;
+    const url = error.config?.url;
+
+    // интересуют только auth-ошибки
+    if (![401, 403].includes(status)) {
+      throw error;
+    }
+
+    // чтобы не зациклиться
+    if (error.config._retry) {
+      throw error;
+    }
+
+    error.config._retry = true;
+
+    try {
+      if (!isLoggingIn) {
+        isLoggingIn = true;
+        loginPromise = login();
+      }
+
+      await loginPromise;
+    } catch (e) {
+      isLoggingIn = false;
+      loginPromise = null;
+      throw e;
+    }
+
+    isLoggingIn = false;
+    loginPromise = null;
+
+    // повторяем исходный запрос
+    return api(error.config);
+  }
+);
+
 
 export async function getInbounds() {
   const res = await api.get("/panel/api/inbounds/list");
