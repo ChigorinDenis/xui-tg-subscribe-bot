@@ -11,16 +11,25 @@ export const adminKeyboard = {
   }
 };
 
-export const userKeyboard = {
-  reply_markup: {
+export function supportEntryKeyboard() {
+  return {
+    inline_keyboard: [
+      [{ text: "💬 Написать в поддержку", callback_data: "support:enter" }],
+    ],
+  };
+}
+
+
+export function supportExitKeyboard() {
+  return {
     keyboard: [
-      [{ text: "🖥 Подписка" }],
-      [{ text: "👥 Написать в поддержку" }],
+      [{ text: "❌ Завершить поддержку" }]
     ],
     resize_keyboard: true,
-    one_time_keyboard: false
-  }
-};
+    one_time_keyboard: true,
+  };
+}
+
 
 export const commands = [
 

@@ -1,14 +1,29 @@
-export function createContext({ bot, msg, users }) {
-  const tgId = msg.from.id;
+import { isAdmin } from "./auth.js";
+import { saveAdmins, saveUsers } from "./storage.js";
 
-  users[tgId] ??= { state: "normal" };
+export function createContext({ bot, update, users, admins  }) {
+  // const tgId = msg.from.id;
+  // const tgUsername = msg.from.username
+
+  // users[tgId] ??= { mode: 'normal' };
+
+  const isCallback = !!update.data;
+
+  const from = isCallback ? update.from : update.from;
+  const chat = isCallback ? update.message.chat : update.chat;
 
   return {
     bot,
-    msg,
-    tgId,
-    user: users[tgId],
-    isAdmin: ADMINS.includes(tgId),
-    save: () => saveUsers(users)
+    msg: isCallback ? update.message : update,
+    callback: isCallback ? update : null,
+    tgUser: from,
+    chatId: chat.id,
+    user: users[from.id],
+    admin: admins[from.id],
+    users,
+    admins,
+    isAdmin: isAdmin(from.id),
+    saveUsers: (users) => saveUsers(users),
+    saveAdmins: (admins) => saveAdmins(admins)
   };
 }

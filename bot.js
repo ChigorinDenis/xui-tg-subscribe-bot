@@ -4,13 +4,15 @@ import { login, addClient, getLastOnline, getOnlineClients } from "./xui.js";
 import { loadUsers, loadAdmins, saveUsers, saveAdmins } from "./storage.js";
 import { lastOnlineToStr, onlineClientsToStr, makeCopyBtn} from "./utils.js";
 import { isAdmin } from "./auth.js";
-import { userKeyboard, commands} from "./keyboards.js";
+import { commands} from "./keyboards.js";
+import { createContext } from "./context.js";
+import { route } from "./router.js";
 // import { adminKeyboard } from "./adminMenu.js";
 
 const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
 bot.setMyCommands(commands);
-const users = loadUsers();
-const admins = loadAdmins();
+
+
 
 try {
   await login();
@@ -19,154 +21,178 @@ try {
   console.log("❌ Ошибка Logging into 3x-ui", error);
 }
 
+bot.on("message", async (msg) => {
+  const users = await loadUsers();
+  const admins = await loadAdmins();
+  const ctx = createContext({ 
+    bot,
+    update: msg,
+    users,
+    admins
+  });
+  await route(ctx);
+});
+
+
+bot.on("callback_query", async (query) => {
+  const users = await loadUsers();
+  const admins = await loadAdmins();
+  const ctx = createContext({ 
+    bot,
+    update: query,
+    users,
+    admins
+  });
+  await route(ctx);
+});
 
 
 
-bot.onText(/\/start/, async (msg) => {
-  const chatId = msg.chat.id;
-  const tgUser = msg.from;
-  const user = users[tgUser.id];
+// bot.onText(/\/start/, async (msg) => {
+//   const chatId = msg.chat.id;
+//   const tgUser = msg.from;
+//   const user = users[tgUser.id];
 
-  if (isAdmin(msg)) {
-    admins[tgUser.id] = {
-      chatId
-    };
+//   if (isAdmin(msg)) {
+//     admins[tgUser.id] = {
+//       chatId
+//     };
 
-    saveAdmins(admins);
+//     saveAdmins(admins);
 
-    // bot.sendMessage(
-    //   chatId,
-    //   `✅ Приветствую тебя ${tgUser.username} в роли админа!\n`
-    // );
-  } 
+//     bot.sendMessage(
+//       chatId,
+//       `✅ Приветствую тебя ${tgUser.username} в роли админа!\n`
+//     );
+//   } 
   
-  if (user?.status === 'ready') {
-    const replyMarkup = makeCopyBtn('Скопировать ссылку', user.url);
-    return bot.sendMessage(
-      chatId,
-      `🔐 Ваша подписка:\n${user.url}\n\n Скопируйте ссылку!`,
-      {
-        reply_markup: replyMarkup
-      }
-    );
-  }
+//   if (user?.status === 'ready') {
+//     const replyMarkup = makeCopyBtn('Скопировать ссылку', user.url);
+//     return bot.sendMessage(
+//       chatId,
+//       `🔐 Ваша подписка:\n${user.url}\n\n Скопируйте ссылку!`,
+//       {
+//         reply_markup: replyMarkup
+//       }
+//     );
+//   }
 
-  if (user?.status === 'pending') {
-    return bot.sendMessage(
-      chatId,
-      `⏳ Подписка ещё готовится.
-      Пожалуйста, подождите несколько секунд и нажмите /start ещё раз.`
-    );
-  }
+//   if (user?.status === 'pending') {
+//     return bot.sendMessage(
+//       chatId,
+//       `⏳ Подписка ещё готовится.
+//       Пожалуйста, подождите несколько секунд и нажмите /start ещё раз.`
+//     );
+//   }
 
-  users[tgUser.id] = {
-    status: "pending",
-    createdAt: Date.now()
-  };
+//   users[tgUser.id] = {
+//     status: "pending",
+//     createdAt: Date.now()
+//   };
 
-  saveUsers(users);
+//   saveUsers(users);
   
-  bot.sendMessage(
-    chatId,
-    "⏳ Подготавливаем подписку, пожалуйста подождите…"
-  );
+//   bot.sendMessage(
+//     chatId,
+//     "⏳ Подготавливаем подписку, пожалуйста подождите…"
+//   );
 
-  try {
-    const client = await addClient(
-      Number(process.env.INBOUND_ID),
-      tgUser
-    );
+//   try {
+//     const client = await addClient(
+//       Number(process.env.INBOUND_ID),
+//       tgUser
+//     );
 
-    const url = `${process.env.SUB_BASE_URL}/${client.subId}`;
+//     const url = `${process.env.SUB_BASE_URL}/${client.subId}`;
 
-    users[tgUser.id] = {
-      status: 'ready',
-      subId: client.subId,
-      url,
-      createdAt: Date().now,
-      mode: 'normal'
-    };
+//     users[tgUser.id] = {
+//       status: 'ready',
+//       subId: client.subId,
+//       url,
+//       createdAt: Date().now,
+//       mode: 'normal'
+//     };
 
-    saveUsers(users);
+//     saveUsers(users);
 
-    Object.values(admins).forEach((admin) => {
-      // bot.sendMessage(
-      //   admin.chatId,
-      //   `✅ Новый пользователь ${tgUser.username} получил ссылку. \n Его подписка: ${url}`
-      // );
-    });
-    setTimeout(() => {
-      const replyMarkup = makeCopyBtn('Скопировать ссылку', url);
-      bot.sendMessage(
-      chatId,
-      `✅ Готово!\n\nВаша подписка:\n${url}\n\n Скопируйте ссылку!`,
-      {
-        reply_markup: replyMarkup
-      }
-    );
+//     Object.values(admins).forEach((admin) => {
+//       bot.sendMessage(
+//         admin.chatId,
+//         `✅ Новый пользователь ${tgUser.username} получил ссылку. \n Его подписка: ${url}`
+//       );
+//     });
+//     setTimeout(() => {
+//       const replyMarkup = makeCopyBtn('Скопировать ссылку', url);
+//       bot.sendMessage(
+//       chatId,
+//       `✅ Готово!\n\nВаша подписка:\n${url}\n\n Скопируйте ссылку!`,
+//       {
+//         reply_markup: replyMarkup
+//       }
+//     );
 
-    }, 1000);
+//     }, 1000);
     
 
     
-  } catch (e) {
-    console.error(e);
-     bot.sendMessage(
-      chatId,
-      "⏳ Возникла небольшая задержка.\n" +
-      "Подождите 10–20 секунд и нажмите /start ещё раз."
-    );
-  }
-});
+//   } catch (e) {
+//     console.error(e);
+//      bot.sendMessage(
+//       chatId,
+//       "⏳ Возникла небольшая задержка.\n" +
+//       "Подождите 10–20 секунд и нажмите /start ещё раз."
+//     );
+//   }
+// });
 
-bot.onText(/\/menu/, (msg) => {
-  bot.sendMessage(
-  msg.chat.id,
-  "👋 Выберите действие",
-  userKeyboard
-  );
-});
-
-
+// bot.onText(/\/menu/, (msg) => {
+//   bot.sendMessage(
+//   msg.chat.id,
+//   "👋 Выберите действие",
+//   userKeyboard
+//   );
+// });
 
 
-bot.on('message', async (msg) => {
-  const chatId = msg.chat.id;
-  const userId = msg.from?.id;
-  const user = users[userId];
-  switch (msg.text) {
-    case '👥 Написать в поддержку':
-      bot.sendMessage(chatId, '✍️ Напишите сообщение — я передам его в поддержку');
-      users[userId] = {
-        ...user,
-        mode: 'support'
-      };
-      saveUsers(users);
-      break;
-    default:
-      break;
-  }
-});
 
-bot.on ('text', async (msg) => {
-  // const userId = msg.from?.id;
-  // const text = msg.text;
-  // const user = users[userId];
-  // if (!user) {
-  //   console.log('этот юзер не получил еще подписку');
-  //   return;
-  // }
-  // if (user.mode === 'support') {
-  //   bot.sendMessage(
-  //     chatId,
-  //     `🎧 Новое обращение
-  //      👤 TG ID: ${userId}
-  //      💬 Сообщение:
-  //     «${text}»`
-  //   );
-  // }
-  console.log(msg);
-})
+
+// bot.on('message', async (msg) => {
+//   const chatId = msg.chat.id;
+//   const userId = msg.from?.id;
+//   const user = users[userId];
+//   switch (msg.text) {
+//     case '👥 Написать в поддержку':
+//       bot.sendMessage(chatId, '✍️ Напишите сообщение — я передам его в поддержку');
+//       users[userId] = {
+//         ...user,
+//         mode: 'support'
+//       };
+//       saveUsers(users);
+//       break;
+//     default:
+//       break;
+//   }
+// });
+
+// bot.on ('text', async (msg) => {
+//   const userId = msg.from?.id;
+//   const text = msg.text;
+//   const user = users[userId];
+//   if (!user) {
+//     console.log('этот юзер не получил еще подписку');
+//     return;
+//   }
+//   if (user.mode === 'support') {
+//     bot.sendMessage(
+//       chatId,
+//       `🎧 Новое обращение
+//        👤 TG ID: ${userId}
+//        💬 Сообщение:
+//       «${text}»`
+//     );
+//   }
+//   console.log(msg);
+// })
 
 // Обработка кнопок
 // bot.on("message", async (msg) => {

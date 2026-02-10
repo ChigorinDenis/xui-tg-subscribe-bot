@@ -1,4 +1,4 @@
-import { subscriptionHandler } from "./handlers";
+import { subscriptionHandler } from "./handlers.js";
 
 export const subscriptionModule = {
   async handle(ctx) {

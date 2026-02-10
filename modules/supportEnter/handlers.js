@@ -1,0 +1,30 @@
+import { supportExitKeyboard } from "../../keyboards.js";
+
+
+export async function supportEnterHandler(ctx) {
+  if (!ctx.callback) return false;
+  if (ctx.callback.data !== "support:enter") return false;
+
+  if (ctx.user.state === "support") {
+    await ctx.bot.sendMessage(
+      ctx.chatId,
+      "💬 Вы уже находитесь в режиме поддержки. Напишите сообщение."
+    );
+    return true;
+  }
+
+  ctx.user.state = "support";
+  // ctx.user.supportStartedAt = Date.now();
+  ctx.saveUsers(ctx.users);
+
+  await ctx.bot.sendMessage(
+    ctx.chatId,
+    "✍️ Напишите сообщение, мы скоро ответим.\n\n" +
+    "Чтобы выйти — нажмите «Завершить»",
+    {
+      reply_markup: supportExitKeyboard(),
+    }
+  );
+
+  return true;
+}
