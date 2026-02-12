@@ -20,7 +20,7 @@ export async function supportEnterHandler(ctx) {
   await ctx.bot.sendMessage(
     ctx.chatId,
     "✍️ Напишите сообщение, мы скоро ответим.\n\n" +
-    "Чтобы выйти — нажмите «Завершить»",
+    "Или чтобы выйти — нажмите «Завершить»",
     {
       reply_markup: supportExitKeyboard(),
     }

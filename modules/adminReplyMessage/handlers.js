@@ -12,8 +12,14 @@ export async function adminReplyMessageHandler(ctx) {
 
   await ctx.bot.sendMessage(
     ctx.chatId,
-    "✅ Ответ отправлен"
+    "✅ Ответ отправлен",
+    {
+      reply_markup: {
+        remove_keyboard: true
+      }
+    }
   );
+ 
 
   ctx.admin.state = "normal";
   ctx.users[targetId].state = "normal"

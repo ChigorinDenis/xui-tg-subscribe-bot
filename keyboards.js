@@ -22,11 +22,9 @@ export function supportEntryKeyboard() {
 
 export function supportExitKeyboard() {
   return {
-    keyboard: [
-      [{ text: "❌ Завершить поддержку" }]
+    inline_keyboard: [
+      [{ text: "❌ Завершить поддержку", callback_data: "support:exit" }]
     ],
-    resize_keyboard: true,
-    one_time_keyboard: true,
   };
 }
 

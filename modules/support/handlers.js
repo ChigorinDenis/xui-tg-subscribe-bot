@@ -2,7 +2,7 @@ import { SUPPORT_STATE } from "./states.js";
 import { SUPPORT_WAITING_STATE } from "./states.js";
 
 export async function supportHandler(ctx) {
-  if (ctx.user.state !== SUPPORT_STATE && ctx.user.state !== SUPPORT_WAITING_STATE) return false;
+  if (ctx.user?.state !== SUPPORT_STATE && ctx.user?.state !== SUPPORT_WAITING_STATE) return false;
 
   if (ctx.user.state === SUPPORT_WAITING_STATE) {
     await ctx.bot.sendMessage(
@@ -13,16 +13,26 @@ export async function supportHandler(ctx) {
     return true;
   }
 
-  await ctx.bot.sendMessage(
-    910027300,
-    `🆘 SUPPORT\n👤 ID: ${ctx.tgUser.id}\nИмя пользователя: ${ctx.tgUser.username}\n\n${ctx.msg.text}`,
-    {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: "✍️ Ответить", callback_data: `reply:${ctx.tgUser.id}` }]
-      ]
-    }
+  if (!ctx.user?.supportTopicId) {
+    const topic = await ctx.bot.createForumTopic(
+      process.env.ADMIN_GROUP_ID,
+      `👤 ${ctx.msg.from.username || ctx.msg.from.id}`
+    );
+
+    ctx.user.supportTopicId = topic.message_thread_id;
+    await ctx.saveUsers(ctx.users);
   }
+
+  await ctx.bot.sendMessage(
+    process.env.ADMIN_GROUP_ID,
+    `📩 Новое обращение от ${ctx.msg.from.username || ctx.msg.from.id}\n\n${ctx.msg.text}`,
+     { message_thread_id: ctx.user.supportTopicId,
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "✍️ Ответить", callback_data: `reply:${ctx.tgUser.id}` }]
+        ]
+      }
+     }
   );
 
   ctx.user.state = SUPPORT_WAITING_STATE
@@ -35,3 +45,6 @@ export async function supportHandler(ctx) {
 
   return true;
 }
+
+
+

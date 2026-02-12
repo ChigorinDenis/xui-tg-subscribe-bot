@@ -11,8 +11,9 @@ export async function adminReplyCallbackHandler(ctx) {
   ctx.saveAdmins(ctx.admins);
 
   await ctx.bot.sendMessage(
-    ctx.chatId,
-    "✍️ Напишите сообщение пользователю"
+    -1003794698154,
+    "✍️ Напишите сообщение пользователю",
+    { message_thread_id: ctx.users[targetUserId].supportTopicId }
   );
 
   return true;
