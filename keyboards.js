@@ -14,7 +14,7 @@ export const adminKeyboard = {
 export function supportEntryKeyboard() {
   return {
     inline_keyboard: [
-      [{ text: "💬 Написать в поддержку", callback_data: "support:enter" }],
+      [{ text: "💬 Написать в поддержку", callback_data: "support:enter" }]
     ],
   };
 }

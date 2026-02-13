@@ -6,7 +6,9 @@ export async function normalFallbackHandler(ctx) {
 
   await ctx.bot.sendMessage(
     ctx.chatId,
-    "Выберите действие:",
+    `🤖 Вы хотите написать в поддержку?
+
+      Пожалуйста, выберите действие ниже.`,
     {
       reply_markup: supportEntryKeyboard(),
     }

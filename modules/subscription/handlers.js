@@ -4,10 +4,22 @@ import { SUBSCRIBTION_STATE } from "./states.js";
 
 export async function subscriptionHandler(ctx) {
   if (ctx.msg.text !== "/start") return false;
+  
 
-  const { user = {}, users, tgUser, save, bot } = ctx;
+  const { user = {}, users, tgUser, saveUsers, bot } = ctx;
   const chatId = ctx.msg.chat.id;
   const tgId = tgUser.id;
+  
+  if (!(tgId in users)) {
+    await bot.sendMessage(
+      chatId,
+      `👋 Добро пожаловать, ${tgUser.first_name || tgUser.username}!
+      
+      Вы находитесь в сервисе подключения доступа.
+      Здесь же вы сможете получить помощь`
+    );
+    return true;
+  }
 
   // ✅ ГОТОВО — просто отдаём
   if (user.status === "ready" && user.url) {
@@ -17,6 +29,8 @@ export async function subscriptionHandler(ctx) {
       `🔐 Ваша подписка:\n${user.url}`,
       { reply_markup: replyMarkup }
     );
+
+    
     return true;
   }
 
@@ -32,7 +46,7 @@ export async function subscriptionHandler(ctx) {
       status: "pending",
       createdAt: Date.now()
     };
-    save(users);
+    saveUsers(users);
 
     await bot.sendMessage(
       chatId,
@@ -57,7 +71,7 @@ export async function subscriptionHandler(ctx) {
       state: SUBSCRIBTION_STATE
     };
 
-    save(users);
+    saveUsers(users);
 
     const replyMarkup = makeCopyBtn("Скопировать ссылку", url);
     await bot.sendMessage(
@@ -65,6 +79,12 @@ export async function subscriptionHandler(ctx) {
       `✅ Готово!\n\nВаша подписка:\n${url}`,
       { reply_markup: replyMarkup }
     );
+    bot.sendMessage(
+      910027300,
+      `✅ Новый пользователь ${tgUser.username} получил ссылку. \n Его подписка: ${url}`
+    );
+
+    
 
   } catch (e) {
     console.error("addClient error:", e);
@@ -72,11 +92,11 @@ export async function subscriptionHandler(ctx) {
     // ⚠️ ВАЖНО: не оставляем пользователя навечно в pending
     users[tgId] = {
       ...users[tgId],
-      status: "pending",
+      status: "error",
       lastErrorAt: Date.now()
     };
 
-    save(users);
+    saveUsers(users);
 
     await bot.sendMessage(
       chatId,
