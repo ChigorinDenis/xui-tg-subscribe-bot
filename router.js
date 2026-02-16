@@ -10,9 +10,9 @@ import { normalFallbackModule } from "./modules/normalFallback/index.js";
 // import { commonHandlers } from "./modules/common";
 
 const modules = [
-  // adminInitModule,
-  // adminReplyCallbackModule,
-  // adminReplyMessageModule,
+  adminInitModule,
+  adminReplyCallbackModule,
+  adminReplyMessageModule,
   supportEnterModule,
   supportExitModule,
   supportModule,

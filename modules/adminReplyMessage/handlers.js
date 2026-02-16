@@ -13,11 +13,7 @@ export async function adminReplyMessageHandler(ctx) {
   await ctx.bot.sendMessage(
     ctx.chatId,
     "✅ Ответ отправлен",
-    {
-      reply_markup: {
-        remove_keyboard: true
-      }
-    }
+     { message_thread_id: ctx.users[targetId].supportTopicId }
   );
  
 
