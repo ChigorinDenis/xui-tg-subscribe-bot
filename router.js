@@ -7,7 +7,7 @@ import { supportEnterModule } from "./modules/supportEnter/index.js";
 import { supportExitModule } from "./modules/supportExit/index.js";
 import { subscriptionModule } from "./modules/subscription/index.js";
 import { normalFallbackModule } from "./modules/normalFallback/index.js";
-// import { commonHandlers } from "./modules/common";
+import { commandsModule } from "./modules/commands/index.js";
 
 const modules = [
   adminInitModule,
@@ -17,7 +17,7 @@ const modules = [
   supportExitModule,
   supportModule,
   subscriptionModule,
-  normalFallbackModule
+  commandsModule
 ];
 
 export async function route(ctx) {

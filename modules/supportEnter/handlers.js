@@ -5,26 +5,30 @@ export async function supportEnterHandler(ctx) {
   if (!ctx.callback) return false;
   if (ctx.callback.data !== "support:enter") return false;
 
-  if (ctx.user.state === "support") {
+  try {
+    if (ctx.user.state === "support") {
+      await ctx.bot.sendMessage(
+        ctx.chatId,
+        "💬 Вы уже находитесь в режиме поддержки. Напишите сообщение."
+      );
+      return true;
+    }
+
+    ctx.user.state = "support";
+    ctx.saveUsers(ctx.users);
+
     await ctx.bot.sendMessage(
       ctx.chatId,
-      "💬 Вы уже находитесь в режиме поддержки. Напишите сообщение."
+      "✍️ Напишите сообщение, мы скоро ответим.\n\n" +
+      "Или чтобы выйти — нажмите «Завершить»",
+      {
+        reply_markup: supportExitKeyboard(),
+      }
     );
-    return true;
+
+  } catch (err) {
+    console.log('❌ Error in suppor Enter', err);
   }
-
-  ctx.user.state = "support";
-  // ctx.user.supportStartedAt = Date.now();
-  ctx.saveUsers(ctx.users);
-
-  await ctx.bot.sendMessage(
-    ctx.chatId,
-    "✍️ Напишите сообщение, мы скоро ответим.\n\n" +
-    "Или чтобы выйти — нажмите «Завершить»",
-    {
-      reply_markup: supportExitKeyboard(),
-    }
-  );
 
   return true;
 }

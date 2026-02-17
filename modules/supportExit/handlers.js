@@ -1,18 +1,18 @@
 export async function supportExitHandler(ctx) {
   if (!ctx.callback) return false;
   if (ctx.callback.data !== "support:exit") return false;
-  // if (ctx.msg.text !== "❌ Завершить поддержку") return false;
-  // if (ctx.user.state !== "support") return false;
+  try {
+    ctx.user.state = "normal";
+    ctx.saveUsers(ctx.users);
 
-  ctx.user.state = "normal";
-  ctx.saveUsers(ctx.users);
+    await ctx.bot.sendMessage(
+      ctx.chatId,
+      "✅ Диалог завершён",
+    );
 
-  await ctx.bot.sendMessage(
-    ctx.chatId,
-    "✅ Диалог завершён",
-  );
-  console.log('data',  ctx.callback)
-  //  await ctx.bot.answerCallbackQuery("✅ Диалог завершён")
+  } catch (err) {
+    console.log('❌ Error in support exit', err);
+  }
 
   return true;
 }

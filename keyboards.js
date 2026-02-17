@@ -38,10 +38,8 @@ export const commands = [
 
     },
     {
-
-        command: 'menu',
-        description: 'Вызов меню'
-
+        command: 'support',
+        description: 'Запуск поддержки'
     },
 
 ]

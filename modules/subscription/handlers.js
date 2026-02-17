@@ -76,7 +76,7 @@ export async function subscriptionHandler(ctx) {
       { reply_markup: replyMarkup }
     );
     bot.sendMessage(
-      910027300,
+      process.env.ADMIN_IDS,
       `✅ Новый пользователь ${tgUser.username} получил ссылку. \n Его подписка: ${url}`
     );
 

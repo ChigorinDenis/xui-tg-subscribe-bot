@@ -1,13 +1,12 @@
 import TelegramBot from "node-telegram-bot-api";
 import "dotenv/config";
-import { login, addClient, getLastOnline, getOnlineClients } from "./xui.js";
-import { loadUsers, loadAdmins, saveUsers, saveAdmins } from "./storage.js";
-import { lastOnlineToStr, onlineClientsToStr, makeCopyBtn} from "./utils.js";
-import { isAdmin } from "./auth.js";
+import { login  } from "./xui.js";
+import { loadUsers, loadAdmins } from "./storage.js";
+
+
 import { commands} from "./keyboards.js";
 import { createContext } from "./context.js";
 import { route } from "./router.js";
-// import { adminKeyboard } from "./adminMenu.js";
 
 const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
 bot.setMyCommands(commands);
