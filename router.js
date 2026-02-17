@@ -17,6 +17,7 @@ const modules = [
   supportExitModule,
   supportModule,
   subscriptionModule,
+  normalFallbackModule,
   commandsModule
 ];
 
