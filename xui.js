@@ -27,7 +27,14 @@ api.interceptors.response.use(
     const url = error.config?.url;
 
     // интересуют только auth-ошибки
-    if (![401, 403].includes(status)) {
+    // if (![401, 403].includes(status)) {
+    //   throw error;
+    // }
+
+    const isAuthError = [401, 403].includes(status) ||
+      (status === 404 && url?.includes("/panel/api"));
+
+    if (!isAuthError) {
       throw error;
     }
 
