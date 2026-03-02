@@ -13,17 +13,17 @@ bot.setMyCommands(commands);
 
 
 
-try {
-  await login();
-  console.log("✅ Logged into 3x-ui");
-} catch (error) {
-  console.log("❌ Ошибка Logging into 3x-ui", error);
-}
+// try {
+//   await login();
+//   console.log("✅ Logged into 3x-ui");
+// } catch (error) {
+//   console.log("❌ Ошибка Logging into 3x-ui", error);
+// }
 
 bot.on("message", async (msg) => {
-  const users = await loadUsers();
-  const admins = await loadAdmins();
-  const ctx = createContext({ 
+  const users = loadUsers();
+  const admins = loadAdmins();
+  const ctx = createContext({
     bot,
     update: msg,
     users,
@@ -34,9 +34,9 @@ bot.on("message", async (msg) => {
 
 
 bot.on("callback_query", async (query) => {
-  const users = await loadUsers();
-  const admins = await loadAdmins();
-  const ctx = createContext({ 
+  const users = loadUsers();
+  const admins = loadAdmins();
+  const ctx = createContext({
     bot,
     update: query,
     users,

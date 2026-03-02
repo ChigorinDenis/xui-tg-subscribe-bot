@@ -10,15 +10,15 @@ import { normalFallbackModule } from "./modules/normalFallback/index.js";
 import { commandsModule } from "./modules/commands/index.js";
 
 const modules = [
-  adminInitModule,
-  adminReplyCallbackModule,
-  adminReplyMessageModule,
-  supportEnterModule,
-  supportExitModule,
-  supportModule,
+  // adminInitModule,
+  // adminReplyCallbackModule,
+  // adminReplyMessageModule,
+  // supportEnterModule,
+  // supportExitModule,
+  // supportModule,
   subscriptionModule,
-  normalFallbackModule,
-  commandsModule
+  // normalFallbackModule,
+  // commandsModule
 ];
 
 export async function route(ctx) {

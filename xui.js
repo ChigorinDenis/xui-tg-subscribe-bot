@@ -20,6 +20,9 @@ export async function login() {
   }));
 }
 
+let isLoggingIn = false;
+let loginPromise = null;
+
 api.interceptors.response.use(
   res => res,
   async (error) => {
@@ -33,6 +36,8 @@ api.interceptors.response.use(
 
     const isAuthError = [401, 403].includes(status) ||
       (status === 404 && url?.includes("/panel/api"));
+
+    console.log('status', status)
 
     if (!isAuthError) {
       throw error;
